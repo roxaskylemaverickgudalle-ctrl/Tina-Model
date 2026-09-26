@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+
+merged_tina/model.safetensors
+
+tina-onnx-model/model.onnx_data
+tina-onnx-model/onnx/model.onnx_data
+tina-onnx-model/onnx/model.onnx
+tina-onnx-model/onnx/model_quantized.onnx

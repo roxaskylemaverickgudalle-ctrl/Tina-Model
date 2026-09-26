@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HealthyLifePhil - AI Business Chatbot</title>
+  
+  <!-- React, Tailwind, and Supabase -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-950 text-white font-sans">
+  <div id="root"></div>
+
+  <!-- ESM Transformers.js Module Setup -->
+  <script type="module">
+    import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2';
+    env.allowLocalModels = true;
+    env.allowRemoteModels = false;
+    env.localModelPath = "./";
+    window.hfPipeline = pipeline;
+  </script>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // The ONNX model is stored beside this HTML file in the Space repository.
+    const TINA_MODEL_ID = "tina-onnx-model";
+    const SUPABASE_URL = "https://ixntxgqaggkaaekewazu.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_7SZ_z5FKbA77vZ04rnJKGQ_zXssCIT0";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function App() {
+      const [messages, setMessages] = useState([
+        { sender: "bot", text: "Hello! I am Tina, your HealthyLifePhil AI assistant. Ask me about products, sales, inventory, or business data!" }
+      ]);
+      const [input, setInput] = useState("");
+      const [loading, setLoading] = useState(false);
+      const [status, setStatus] = useState("Ready");
+
+      const pipelinesRef = useRef({
+        generate: null
+      });
+
+      const getPipeline = async (task, model, options = {}) => {
+        if (!window.hfPipeline) {
+          throw new Error("AI Library is still initializing. Please wait 3 seconds...");
+        }
+        return await window.hfPipeline(task, model, options);
+      };
+
+      const handleSend = async () => {
+        if (!input.trim() || loading) return;
+
+        const userQuery = input.trim();
+        const updatedHistory = [...messages, { sender: "user", text: userQuery }];
+        setMessages(updatedHistory);
+        setInput("");
+        setLoading(true);
+
+        try {
+          // 1. GUARDRAIL CHECK (Sentiment + Security Patterns)
+          setStatus("Running Guardrails Check...");
+          
+          const maliciousPattern = /(scam|hack|exploit|drop\s+table|delete\s+from|insert\s+into|alter\s+table|<script>|bypass|override|crack)/i;
+          if (maliciousPattern.test(userQuery)) {
+            setMessages(prev => [...prev, { 
+              sender: "bot", 
+              text: "🛡️ [Guardrail Triggered]: Request blocked due to security or policy restrictions. Please ask a valid business question." 
+            }]);
+            setLoading(false);
+            setStatus("Ready");
+            return;
+          }
+
+          if (/(hate|stupid|bad|useless|dumb|garbage)/i.test(userQuery)) {
+            setMessages(prev => [...prev, { 
+              sender: "bot", 
+              text: "🛡️ [Guardrail Triggered]: Please keep queries professional and constructive." 
+            }]);
+            setLoading(false);
+            setStatus("Ready");
+            return;
+          }
+
+          // 2. SUPABASE DATA QUERY & SUMMARIZATION
+          const isBusinessQuery = /(sales|product|inventory|order|business|store|item|stock)/i.test(userQuery);
+
+          if (isBusinessQuery) {
+            setStatus("Fetching Supabase Data...");
+            const [{ data: products, error: productsError }, { data: orders, error: ordersError }] = await Promise.all([
+              supabase.from('products').select('*'),
+              supabase.from('orders').select('*')
+            ]);
+
+            if (productsError) throw new Error(`Products query failed: ${productsError.message}`);
+            if (ordersError) throw new Error(`Orders query failed: ${ordersError.message}`);
+
+            const rawDataString = `
+Database State:
+Products In Stock: ${JSON.stringify(products || [])}
+Orders History: ${JSON.stringify(orders || [])}
+`;
+
+            setStatus("Analyzing Supabase Data...");
+            if (!pipelinesRef.current.generate) {
+              pipelinesRef.current.generate = await getPipeline('text-generation', TINA_MODEL_ID);
+            }
+
+            const analyticsPrompt = [
+              "<|im_start|>system",
+              "You are Tina, a concise business analytics assistant. Analyze only the supplied Supabase data. Do not invent values. Mention when data is missing.",
+              "<|im_end|>",
+              "<|im_start|>user",
+              `Question: ${userQuery}\n\n${rawDataString}`,
+              "<|im_end|>",
+              "<|im_start|>assistant"
+            ].join("\n");
+            const summaryOutput = await pipelinesRef.current.generate(analyticsPrompt, {
+              max_new_tokens: 140,
+              temperature: 0.2,
+              do_sample: false,
+              return_full_text: false
+            });
+
+            const cleanFormattedSummary = summaryOutput[0].generated_text
+              .replace(/<\|im_end\|>[\s\S]*$/, "")
+              .trim();
+            const finalBotResponse = `Supabase analytics:\n\n${cleanFormattedSummary}`;
+
+            setMessages(prev => [...prev, { 
+              sender: "bot", 
+              text: finalBotResponse 
+            }]);
+
+          } else {
+            // 3. CONVERSATIONAL TEXT GENERATION (Fine-tuned Qwen ONNX model)
+            setStatus("Generating Conversational Response...");
+            if (!pipelinesRef.current.generate) {
+              pipelinesRef.current.generate = await getPipeline('text-generation', TINA_MODEL_ID);
+            }
+
+            const prompt = [
+              "<|im_start|>system",
+              "You are Tina, an AI business assistant for HealthyLifePhil. Provide helpful, polite and concise answers.",
+              "<|im_end|>",
+              "<|im_start|>user",
+              userQuery,
+              "<|im_end|>",
+              "<|im_start|>assistant"
+            ].join("\n");
+            const genOutput = await pipelinesRef.current.generate(prompt, {
+              max_new_tokens: 60,
+              temperature: 0.7,
+              do_sample: true,
+              return_full_text: false
+            });
+
+            let cleanResponse = genOutput[0].generated_text
+              .replace(/<\|im_end\|>[\s\S]*$/, "")
+              .trim();
+
+            if (!cleanResponse || cleanResponse.length < 3) {
+              cleanResponse = "Hello! I am Tina, your HealthyLifePhil business assistant. Ask me about inventory, sales analytics, or order status!";
+            }
+
+            setMessages(prev => [...prev, { 
+              sender: "bot", 
+              text: cleanResponse 
+            }]);
+          }
+
+          setStatus("Ready");
+        } catch (err) {
+          console.error(err);
+          setMessages(prev => [...prev, { 
+            sender: "bot", 
+            text: `⚠️ Error processing request: ${err.message}` 
+          }]);
+          setStatus("Failed");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      return (
+        <div className="flex h-screen bg-slate-950 text-white">
+          <div className="w-64 bg-slate-900 p-4 border-r border-slate-800 flex flex-col justify-between hidden md:flex">
+            <div>
+              <h1 className="text-md font-bold text-white mb-1">HealthyLifePhil</h1>
+              <p className="text-xs text-emerald-400">AI Assistant Engine</p>
+            </div>
+            <div className="text-xs text-slate-500">Connected to Supabase DB</div>
+          </div>
+
+          <div className="flex-1 flex flex-col">
+            <header className="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center text-sm font-semibold">
+              <span>Tina — Business Analysis Chatbot</span>
+              <span className="text-xs text-emerald-400">{status}</span>
+            </header>
+
+            <div className="flex-1 p-6 overflow-y-auto space-y-4">
+              {messages.map((m, index) => (
+                <div key={index} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`p-4 rounded-xl max-w-lg text-sm whitespace-pre-wrap ${
+                    m.sender === 'user' ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-200 border border-slate-700'
+                  }`}>
+                    {m.text}
+                  </div>
+                </div>
+              ))}
+              {loading && <div className="text-xs text-emerald-400 italic animate-pulse">Tina is processing request...</div>}
+            </div>
+
+            <div className="p-4 bg-slate-900 border-t border-slate-800 flex gap-2">
+              <input
+                type="text"
+                className="flex-1 p-3 rounded-lg bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-500"
+                placeholder="Ask about sales, products, inventory, or chat naturally..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              />
+              <button 
+                onClick={handleSend} 
+                disabled={loading} 
+                className="bg-emerald-600 hover:bg-emerald-500 px-5 py-2 rounded-lg font-bold text-sm text-black transition-colors disabled:opacity-50"
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const rootElement = document.getElementById('root');
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(<App />);
+  </script>
+</body>
+</html>
