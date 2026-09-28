@@ -1,0 +1,56 @@
+.gantt-chart {
+  --gantt-surface: #f6f8ec;
+  --gantt-track: #e6eddc;
+  --gantt-grid: #ccd9c0;
+  --gantt-ink: #263d2a;
+  --gantt-muted: #546854;
+  --gantt-accent: #236b39;
+  color: var(--gantt-ink);
+  background: var(--gantt-surface);
+}
+
+.gantt-chart[data-template="sky"] {
+  --gantt-surface: #eef7fa;
+  --gantt-track: #dcebf0;
+  --gantt-grid: #b9d4dd;
+  --gantt-ink: #193b4a;
+  --gantt-muted: #315d6b;
+}
+
+.gantt-chart[data-template="orchard"] {
+  --gantt-surface: #f5f1df;
+  --gantt-track: #e9e1c9;
+  --gantt-grid: #d2c5a3;
+  --gantt-ink: #483e26;
+  --gantt-muted: #625735;
+}
+
+.gantt-track {
+  position: relative;
+  height: 2.5rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background-color: var(--gantt-track);
+  background-image: linear-gradient(to right, var(--gantt-grid) 1px, transparent 1px);
+  background-size: 25% 100%;
+}
+
+.gantt-bar {
+  position: absolute;
+  top: 50%;
+  min-width: 0.5rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  background-color: var(--gantt-accent);
+  box-shadow: inset 0 0 0 1px rgb(25 55 43 / 12%);
+  transform: translateY(-50%);
+  transition: filter 140ms ease;
+}
+
+.gantt-bar:hover { filter: brightness(.88); }
+
+.gantt-download:disabled { cursor: not-allowed; opacity: .5; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gantt-bar { transition: none; }
+}

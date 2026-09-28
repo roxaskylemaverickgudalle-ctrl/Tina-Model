@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HealthyLifePhil - AI Business Chatbot</title>
+  <title>Tina Build Coach - Student Project Studio</title>
   
   <!-- React, Tailwind, and Supabase -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
@@ -11,6 +11,114 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.9.0/mammoth.browser.min.js"></script>
+  <link rel="stylesheet" href="./features/gantt/gantt.css" />
+  <script src="./features/gantt/gantt.js"></script>
+  <style>
+    :root {
+      --canvas: #dcebe1;
+      --surface: #f5f8f0;
+      --surface-soft: #e2edda;
+      --line: #bed2bf;
+      --ink: #19372b;
+      --muted: #425d4b;
+      --green: #236b39;
+      --green-hover: #1b5a30;
+      --green-soft: #d8e9d0;
+      --sky: #c9e6ef;
+      --meadow: #9fca4e;
+    }
+
+    html, body, #root { min-height: 100%; margin: 0; }
+    body { background: var(--canvas); color: var(--ink); }
+    body.bg-slate-950 { background-color: var(--canvas); }
+    body.text-white { color: var(--ink); }
+    body [class~="bg-slate-950"] { background-color: var(--canvas); }
+    body [class~="bg-slate-900"] { background-color: var(--surface); }
+    body [class~="bg-slate-900/60"] { background-color: #f5f8f0e8; }
+    body [class~="bg-slate-900/70"] { background-color: #edf4e8; }
+    body [class~="bg-slate-800"] { background-color: var(--surface-soft); }
+    body [class~="bg-slate-800/60"] { background-color: #c9e6efb8; }
+    body [class~="bg-slate-700"] { background-color: #d7e7d0; }
+    body [class~="bg-emerald-950"] { background-color: #dcebd7; }
+    body [class~="bg-emerald-950/60"] { background-color: #286c3b; }
+    body [class~="bg-emerald-400"] { background-color: var(--green); }
+    body [class~="bg-emerald-300"] { background-color: var(--green-hover); }
+    body [class~="bg-emerald-700"] { background-color: #286c3b; }
+    body [class~="bg-amber-950/60"] { background-color: #fff5df; }
+    body [class~="border-slate-800"] { border-color: var(--line); }
+    body [class~="border-slate-700"], body [class~="border-slate-600"] { border-color: #b8ceb9; }
+    body [class~="border-emerald-900"] { border-color: #b7d4ae; }
+    body [class~="border-amber-900"] { border-color: #ead7ad; }
+    body [class~="text-white"] { color: var(--ink); }
+    body [class~="text-slate-100"] { color: #1c3325; }
+    body [class~="text-slate-200"] { color: #243d2d; }
+    body [class~="text-slate-300"] { color: #2d4835; }
+    body [class~="text-slate-400"] { color: #344f3b; }
+    body [class~="text-slate-500"] { color: #3d5943; }
+    body [class~="text-slate-950"] { color: #ffffff; }
+    body [class~="text-emerald-400"], body [class~="text-emerald-300"] { color: #194c2b; }
+    body [class~="text-emerald-200"] { color: #214f2d; }
+    body [class~="text-emerald-100"] { color: #315437; }
+    body [class~="text-amber-200"], body [class~="text-amber-300"] { color: #805d18; }
+    body [class~="bg-emerald-700"].text-white { color: #ffffff; }
+    body [class~="bg-slate-700"]:hover { background-color: #c9dfc2; }
+    body [class~="bg-emerald-400"]:hover { background-color: var(--green-hover); }
+    body [role="status"][class~="bg-emerald-950/60"] { color: #ffffff; }
+    button, summary { transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 120ms ease; }
+    button:not(:disabled):active { transform: translateY(1px); }
+    button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid #49a564; outline-offset: 2px; }
+    .garden-sweep { position: relative; isolation: isolate; overflow: hidden; }
+    .garden-sweep::before {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      background: var(--green-hover);
+      content: "";
+      transform: translateY(101%);
+      transition: transform 260ms cubic-bezier(.2,.7,.2,1);
+    }
+    .garden-sweep:hover::before, .garden-sweep:focus-visible::before { transform: translateY(0); }
+    body .garden-sweep:hover, body .garden-sweep:focus-visible { color: #ffffff; border-color: var(--green); }
+    .garden-sweep > span { position: relative; z-index: 1; }
+    .garden-nav-icon {
+      position: relative;
+      display: inline-grid;
+      width: 1.75rem;
+      height: 1.75rem;
+      flex: 0 0 auto;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 9999px;
+      background: #d1e5cf;
+      color: #214f2d;
+      perspective: 240px;
+    }
+    .garden-nav-icon::before {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: var(--green);
+      content: "";
+      transform: translateY(101%);
+      transition: transform 260ms cubic-bezier(.2,.7,.2,1);
+    }
+    .garden-icon-glyph { position: relative; transition: transform 520ms cubic-bezier(.2,.7,.2,1); }
+    .garden-sweep:hover .garden-nav-icon::before, .garden-sweep:focus-visible .garden-nav-icon::before { transform: translateY(0); }
+    .garden-sweep:hover .garden-icon-glyph, .garden-sweep:focus-visible .garden-icon-glyph { color: #ffffff; transform: rotateY(360deg); }
+    @media (prefers-reduced-motion: reduce) {
+      .garden-sweep::before, .garden-nav-icon::before, .garden-icon-glyph { transition: none; }
+    }
+    .app-shell {
+      background:
+        radial-gradient(ellipse at 12% 100%, rgb(159 202 78 / 24%), transparent 40%),
+        radial-gradient(ellipse at 88% 0%, rgb(103 177 204 / 24%), transparent 42%),
+        linear-gradient(145deg, #d2e9ee 0%, #e8efdc 54%, #d5e5d0 100%);
+    }
+    .app-shell main > header, .app-shell main > nav[aria-label="Project sections"] {
+      background: linear-gradient(90deg, #c8e3e9 0%, #e2ebcf 100%);
+    }
+  </style>
 </head>
 <body class="bg-slate-950 text-white font-sans">
   <div id="root"></div>
@@ -22,217 +130,877 @@
     env.allowRemoteModels = false;
     env.localModelPath = "./";
     window.hfPipeline = pipeline;
+    window.loadPdfJs = async () => {
+      if (!window.pdfjsLib) {
+        window.pdfjsLib = await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs');
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
+      }
+      return window.pdfjsLib;
+    };
   </script>
 
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
+
+    const extractProjectBrief = async (file) => {
+      if (file.size > 8 * 1024 * 1024) {
+        throw new Error("Please choose a file smaller than 8 MB.");
+      }
+
+      const extension = file.name.split(".").pop().toLowerCase();
+      let text = "";
+      if (extension === "txt" || extension === "md") {
+        text = await file.text();
+      } else if (extension === "docx") {
+        if (!window.mammoth) throw new Error("The DOCX reader did not load. Try a PDF or text file.");
+        const result = await window.mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+        text = result.value;
+      } else if (extension === "pdf") {
+        const pdfjsLib = await window.loadPdfJs();
+        const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+        const pages = [];
+        for (let pageNumber = 1; pageNumber <= Math.min(pdf.numPages, 30); pageNumber += 1) {
+          const page = await pdf.getPage(pageNumber);
+          const content = await page.getTextContent();
+          pages.push(content.items.map(item => item.str).join(" "));
+        }
+        text = pages.join("\n");
+      } else {
+        throw new Error("Use a PDF, DOCX, TXT, or Markdown project brief.");
+      }
+
+      const cleanText = text.replace(/\0/g, "").trim();
+      if (!cleanText) throw new Error("No readable text found. Scanned PDFs need OCR before upload.");
+      return cleanText.slice(0, 12000);
+    };
 
     // The ONNX model is stored beside this HTML file in the Space repository.
     const TINA_MODEL_ID = "tina-onnx-model";
     const SUPABASE_URL = "https://ixntxgqaggkaaekewazu.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_7SZ_z5FKbA77vZ04rnJKGQ_zXssCIT0";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const DEMO_STORAGE_KEY = "tina-build-coach-demo-v1";
+
+    const createDemoWorkspace = () => {
+      const now = new Date().toISOString();
+      return {
+        projects: [{
+          id: "demo-project-library",
+          owner_id: "demo-user",
+          title: "Campus Library Borrowing System",
+          summary: "Demo brief: A web app for students to search library books, check availability, and request a loan. Librarians need to manage the catalog and approve or reject requests. The student team is still deciding how overdue returns should be handled.",
+          tech_stack: ["React", "Supabase", "PostgreSQL"],
+          created_at: now,
+          updated_at: now
+        }],
+        requirements: [{
+          id: "demo-requirement-search",
+          project_id: "demo-project-library",
+          description: "Students can search the catalog and see whether a book is available.",
+          status: "in_progress",
+          evidence: "",
+          created_at: now,
+          updated_at: now
+        }],
+        milestones: [{
+          id: "demo-milestone-prototype",
+          project_id: "demo-project-library",
+          title: "Build the catalog search prototype",
+          details: "",
+          due_date: null,
+          status: "not_started",
+          position: 0,
+          created_at: now,
+          updated_at: now
+        }],
+        messages: [{
+          id: "demo-message-welcome",
+          project_id: "demo-project-library",
+          role: "assistant",
+          content: "Welcome to the demo project. I have the library-system brief, stack, one requirement, and a milestone. Ask me what to build next, or try a mock defense question.",
+          created_at: now
+        }]
+      };
+    };
+
+    const readDemoWorkspace = () => {
+      try {
+        const saved = JSON.parse(localStorage.getItem(DEMO_STORAGE_KEY));
+        if (saved && Array.isArray(saved.projects) && Array.isArray(saved.requirements) && Array.isArray(saved.milestones) && Array.isArray(saved.messages)) {
+          return saved;
+        }
+      } catch (error) {
+        console.warn("Could not read the saved demo workspace.", error);
+      }
+      const workspace = createDemoWorkspace();
+      localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(workspace));
+      return workspace;
+    };
+
+    const updateDemoWorkspace = (update) => {
+      const workspace = readDemoWorkspace();
+      update(workspace);
+      localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(workspace));
+      return workspace;
+    };
+
+    const createDemoId = () => `demo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
     function App() {
-      const [messages, setMessages] = useState([
-        { sender: "bot", text: "Hello! I am Tina, your HealthyLifePhil AI assistant. Ask me about products, sales, inventory, or business data!" }
-      ]);
+      const [user, setUser] = useState(null);
+      const [demoMode, setDemoMode] = useState(false);
+      const [authMode, setAuthMode] = useState("sign_in");
+      const [authEmail, setAuthEmail] = useState("");
+      const [authPassword, setAuthPassword] = useState("");
+      const [showPassword, setShowPassword] = useState(false);
+      const [authNotice, setAuthNotice] = useState("");
+      const [authBusy, setAuthBusy] = useState(false);
+      useEffect(() => {
+        setShowPassword(false);
+      }, [authMode]);
+      const [projects, setProjects] = useState([]);
+      const [activeProject, setActiveProject] = useState(null);
+      const [activeSection, setActiveSection] = useState("overview");
+      const [requirements, setRequirements] = useState([]);
+      const [milestones, setMilestones] = useState([]);
+      const [messages, setMessages] = useState([]);
       const [input, setInput] = useState("");
-      const [loading, setLoading] = useState(false);
       const [status, setStatus] = useState("Ready");
+      const [notice, setNotice] = useState("");
+      const [projectTitle, setProjectTitle] = useState("");
+      const [projectSummary, setProjectSummary] = useState("");
+      const [projectNotes, setProjectNotes] = useState("");
+      const [projectStack, setProjectStack] = useState("");
+      const [briefFileName, setBriefFileName] = useState("");
+      const [briefStatus, setBriefStatus] = useState("");
+      const [requirementDraft, setRequirementDraft] = useState("");
+      const [milestoneDraft, setMilestoneDraft] = useState("");
+      const [startDateDraft, setStartDateDraft] = useState("");
+      const [dueDateDraft, setDueDateDraft] = useState("");
+      const [ganttPreferences, setGanttPreferences] = useState(() => window.GanttTools.readPreferences());
+      const [ganttExporting, setGanttExporting] = useState(false);
+      const [ganttExportNotice, setGanttExportNotice] = useState("");
+      const [loading, setLoading] = useState(false);
+      const [savingProject, setSavingProject] = useState(false);
+      const pipelinesRef = useRef({ generate: null });
+      const chatEndRef = useRef(null);
 
-      const pipelinesRef = useRef({
-        generate: null
-      });
-
-      const getPipeline = async (task, model, options = {}) => {
+      const getPipeline = async () => {
         if (!window.hfPipeline) {
-          throw new Error("AI Library is still initializing. Please wait 3 seconds...");
+          throw new Error("Tina is still loading. Wait a moment and try again.");
         }
-        return await window.hfPipeline(task, model, options);
+        if (!pipelinesRef.current.generate) {
+          pipelinesRef.current.generate = await window.hfPipeline("text-generation", TINA_MODEL_ID);
+        }
+        return pipelinesRef.current.generate;
       };
 
-      const handleSend = async () => {
-        if (!input.trim() || loading) return;
+      const openProject = async (project) => {
+        setActiveProject(project);
+        setActiveSection("overview");
+        setMessages([]);
+        setNotice("");
+        setStatus("Loading project...");
 
-        const userQuery = input.trim();
-        const updatedHistory = [...messages, { sender: "user", text: userQuery }];
-        setMessages(updatedHistory);
+        if (demoMode) {
+          const workspace = readDemoWorkspace();
+          setRequirements(workspace.requirements.filter(item => item.project_id === project.id));
+          setMilestones(workspace.milestones.filter(item => item.project_id === project.id));
+          setMessages(workspace.messages.filter(item => item.project_id === project.id).map(message => ({
+            id: message.id,
+            sender: message.role === "assistant" ? "bot" : "user",
+            text: message.content
+          })));
+          setStatus("Demo workspace ready");
+          return;
+        }
+
+        const [requirementsResult, milestonesResult, messagesResult] = await Promise.all([
+          supabase.from("project_requirements").select("*").eq("project_id", project.id).order("created_at"),
+          supabase.from("project_milestones").select("*").eq("project_id", project.id).order("position"),
+          supabase.from("project_messages").select("*").eq("project_id", project.id).order("created_at")
+        ]);
+        const failedResult = [requirementsResult, milestonesResult, messagesResult].find(result => result.error);
+        if (failedResult) {
+          setStatus("Could not load project");
+          setNotice(failedResult.error.message);
+          return;
+        }
+
+        setRequirements(requirementsResult.data || []);
+        setMilestones(milestonesResult.data || []);
+        setMessages((messagesResult.data || []).map(message => ({
+          id: message.id,
+          sender: message.role === "assistant" ? "bot" : "user",
+          text: message.content
+        })));
+        setStatus("Project ready");
+      };
+
+      useEffect(() => {
+        let mounted = true;
+        supabase.auth.getSession().then(({ data, error }) => {
+          if (!mounted) return;
+          if (error) setAuthNotice(error.message);
+          setUser(data.session?.user || null);
+        });
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+          setUser(session?.user || null);
+          setAuthNotice("");
+        });
+        return () => {
+          mounted = false;
+          subscription.unsubscribe();
+        };
+      }, []);
+
+      useEffect(() => {
+        if (!user) {
+          setProjects([]);
+          setActiveProject(null);
+          setRequirements([]);
+          setMilestones([]);
+          setMessages([]);
+          return;
+        }
+
+        if (demoMode) {
+          const workspace = readDemoWorkspace();
+          setProjects(workspace.projects);
+          if (workspace.projects.length) {
+            openProject(workspace.projects[0]);
+          } else {
+            setActiveProject(null);
+            setStatus("Create your first demo project");
+          }
+          return;
+        }
+
+        let current = true;
+        setStatus("Loading your projects...");
+        supabase.from("student_projects").select("*").order("updated_at", { ascending: false })
+          .then(async ({ data, error }) => {
+            if (!current) return;
+            if (error) {
+              setStatus("Could not load projects");
+              setNotice(error.message);
+              return;
+            }
+            const loadedProjects = data || [];
+            setProjects(loadedProjects);
+            if (loadedProjects.length) {
+              await openProject(loadedProjects[0]);
+            } else {
+              setActiveProject(null);
+              setStatus("Create your first project");
+            }
+          });
+        return () => { current = false; };
+      }, [user, demoMode]);
+
+      useEffect(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, [messages, loading]);
+
+      const handleAuth = async (event) => {
+        event.preventDefault();
+        setAuthBusy(true);
+        setAuthNotice("");
+        try {
+          const credentials = { email: authEmail.trim(), password: authPassword };
+          const result = authMode === "sign_up"
+            ? await supabase.auth.signUp(credentials)
+            : await supabase.auth.signInWithPassword(credentials);
+          if (result.error) throw result.error;
+          if (authMode === "sign_up" && !result.data.session) {
+            setAuthNotice("Check your email to confirm your account, then sign in.");
+          } else {
+            setAuthNotice(authMode === "sign_up" ? "Account created." : "Signed in.");
+          }
+        } catch (error) {
+          setAuthNotice(error.message);
+        } finally {
+          setAuthBusy(false);
+        }
+      };
+
+      const handleSignOut = async () => {
+        if (demoMode) {
+          setDemoMode(false);
+          setUser(null);
+          setActiveProject(null);
+          setNotice("");
+          return;
+        }
+        const { error } = await supabase.auth.signOut();
+        if (error) setNotice(error.message);
+      };
+
+      const startDemo = () => {
+        try {
+          readDemoWorkspace();
+          setDemoMode(true);
+          setUser({ id: "demo-user", email: "Demo account (local only)" });
+          setNotice("");
+        } catch (error) {
+          setAuthNotice(`Could not start the local demo: ${error.message}`);
+        }
+      };
+
+      const handleBriefUpload = async (event) => {
+        const file = event.target.files?.[0];
+        event.target.value = "";
+        if (!file) return;
+        setBriefStatus("Reading your brief...");
+        setNotice("");
+        try {
+          const extractedText = await extractProjectBrief(file);
+          setProjectSummary(extractedText);
+          setBriefFileName(file.name);
+          setProjectTitle(current => current.trim() || file.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " "));
+          setBriefStatus(`Brief ready. Tina will use up to ${extractedText.length.toLocaleString()} characters as project memory.`);
+        } catch (error) {
+          setBriefStatus("");
+          setNotice(error.message);
+        }
+      };
+
+      const handleCreateProject = async (event) => {
+        event.preventDefault();
+        if (!projectTitle.trim()) return;
+        setSavingProject(true);
+        setNotice("");
+        if (demoMode) {
+          const now = new Date().toISOString();
+          const project = {
+            id: createDemoId(),
+            owner_id: "demo-user",
+            title: projectTitle.trim(),
+            summary: [
+              briefFileName ? `Source document: ${briefFileName}` : "",
+              projectSummary.trim(),
+              projectNotes.trim() ? `Student notes:\n${projectNotes.trim()}` : ""
+            ].filter(Boolean).join("\n\n"),
+            tech_stack: projectStack.split(",").map(item => item.trim()).filter(Boolean),
+            created_at: now,
+            updated_at: now
+          };
+          updateDemoWorkspace(workspace => workspace.projects.unshift(project));
+          setSavingProject(false);
+          setProjects(previous => [project, ...previous]);
+          setProjectTitle("");
+          setProjectSummary("");
+          setProjectNotes("");
+          setProjectStack("");
+          setBriefFileName("");
+          setBriefStatus("");
+          await openProject(project);
+          return;
+        }
+        const { data, error } = await supabase.from("student_projects").insert({
+          owner_id: user.id,
+          title: projectTitle.trim(),
+          summary: [
+            briefFileName ? `Source document: ${briefFileName}` : "",
+            projectSummary.trim(),
+            projectNotes.trim() ? `Student notes:\n${projectNotes.trim()}` : ""
+          ].filter(Boolean).join("\n\n"),
+          tech_stack: projectStack.split(",").map(item => item.trim()).filter(Boolean)
+        }).select().single();
+        setSavingProject(false);
+        if (error) {
+          setNotice(error.message);
+          return;
+        }
+        setProjects(previous => [data, ...previous]);
+        setProjectTitle("");
+        setProjectSummary("");
+        setProjectNotes("");
+        setProjectStack("");
+        setBriefFileName("");
+        setBriefStatus("");
+        await openProject(data);
+      };
+
+      const addRequirement = async (event) => {
+        event.preventDefault();
+        if (!requirementDraft.trim() || !activeProject) return;
+        if (demoMode) {
+          const now = new Date().toISOString();
+          const requirement = {
+            id: createDemoId(), project_id: activeProject.id, description: requirementDraft.trim(),
+            status: "not_started", evidence: "", created_at: now, updated_at: now
+          };
+          updateDemoWorkspace(workspace => workspace.requirements.push(requirement));
+          setRequirements(previous => [...previous, requirement]);
+          setRequirementDraft("");
+          return;
+        }
+        const { data, error } = await supabase.from("project_requirements").insert({
+          project_id: activeProject.id,
+          description: requirementDraft.trim()
+        }).select().single();
+        if (error) {
+          setNotice(error.message);
+          return;
+        }
+        setRequirements(previous => [...previous, data]);
+        setRequirementDraft("");
+      };
+
+      const updateRequirementStatus = async (requirement, statusValue) => {
+        if (demoMode) {
+          const now = new Date().toISOString();
+          updateDemoWorkspace(workspace => {
+            workspace.requirements = workspace.requirements.map(item => item.id === requirement.id
+              ? { ...item, status: statusValue, updated_at: now }
+              : item);
+          });
+          setRequirements(previous => previous.map(item => item.id === requirement.id
+            ? { ...item, status: statusValue, updated_at: now }
+            : item));
+          return;
+        }
+        const { data, error } = await supabase.from("project_requirements")
+          .update({ status: statusValue }).eq("id", requirement.id).select().single();
+        if (error) {
+          setNotice(error.message);
+          return;
+        }
+        setRequirements(previous => previous.map(item => item.id === data.id ? data : item));
+      };
+
+      const addMilestone = async (event) => {
+        event.preventDefault();
+        if (!milestoneDraft.trim() || !activeProject) return;
+        if (!startDateDraft || !dueDateDraft || startDateDraft > dueDateDraft) {
+          setNotice("Choose a start date and finish date, with the finish on or after the start.");
+          return;
+        }
+        if (demoMode) {
+          const now = new Date().toISOString();
+          const milestone = {
+            id: createDemoId(), project_id: activeProject.id, title: milestoneDraft.trim(), details: "",
+            start_date: startDateDraft, due_date: dueDateDraft, status: "not_started", position: milestones.length,
+            created_at: now, updated_at: now
+          };
+          updateDemoWorkspace(workspace => workspace.milestones.push(milestone));
+          setMilestones(previous => [...previous, milestone]);
+          setMilestoneDraft("");
+          setStartDateDraft("");
+          setDueDateDraft("");
+          return;
+        }
+        const { data, error } = await supabase.from("project_milestones").insert({
+          project_id: activeProject.id,
+          title: milestoneDraft.trim(),
+          start_date: startDateDraft,
+          due_date: dueDateDraft,
+          position: milestones.length
+        }).select().single();
+        if (error) {
+          setNotice(error.message);
+          return;
+        }
+        setMilestones(previous => [...previous, data]);
+        setMilestoneDraft("");
+        setStartDateDraft("");
+        setDueDateDraft("");
+      };
+
+      const updateMilestoneSchedule = async (event, milestone) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const startDate = formData.get("start_date");
+        const finishDate = formData.get("due_date");
+        if (!startDate || !finishDate || startDate > finishDate) {
+          setNotice("Choose a finish date on or after the activity start date.");
+          return;
+        }
+        setNotice("");
+        if (demoMode) {
+          const now = new Date().toISOString();
+          updateDemoWorkspace(workspace => {
+            workspace.milestones = workspace.milestones.map(item => item.id === milestone.id
+              ? { ...item, start_date: startDate, due_date: finishDate, updated_at: now }
+              : item);
+          });
+          setMilestones(previous => previous.map(item => item.id === milestone.id
+            ? { ...item, start_date: startDate, due_date: finishDate, updated_at: now }
+            : item));
+          return;
+        }
+        const { data, error } = await supabase.from("project_milestones")
+          .update({ start_date: startDate, due_date: finishDate }).eq("id", milestone.id).select().single();
+        if (error) {
+          setNotice(error.message);
+          return;
+        }
+        setMilestones(previous => previous.map(item => item.id === data.id ? data : item));
+      };
+
+      const updateMilestoneStatus = async (milestone, statusValue) => {
+        if (demoMode) {
+          const now = new Date().toISOString();
+          updateDemoWorkspace(workspace => {
+            workspace.milestones = workspace.milestones.map(item => item.id === milestone.id
+              ? { ...item, status: statusValue, updated_at: now }
+              : item);
+          });
+          setMilestones(previous => previous.map(item => item.id === milestone.id
+            ? { ...item, status: statusValue, updated_at: now }
+            : item));
+          return;
+        }
+        const { data, error } = await supabase.from("project_milestones")
+          .update({ status: statusValue }).eq("id", milestone.id).select().single();
+        if (error) {
+          setNotice(error.message);
+          return;
+        }
+        setMilestones(previous => previous.map(item => item.id === data.id ? data : item));
+      };
+
+      const updateGanttPreference = (key, value) => {
+        setGanttPreferences(current => window.GanttTools.savePreferences({ ...current, [key]: value }));
+      };
+
+      const downloadGantt = async (format) => {
+        setGanttExporting(true);
+        setGanttExportNotice("");
+        const options = {
+          title: activeProject?.title || "Project timeline",
+          template: ganttPreferences.template,
+          color: ganttPreferences.color,
+          locale: navigator.language
+        };
+        try {
+          if (format === "png") {
+            await window.GanttTools.downloadPng(milestones, options);
+          } else {
+            window.GanttTools.downloadSvg(milestones, options);
+          }
+          setGanttExportNotice(`Gantt ${format.toUpperCase()} downloaded.`);
+        } catch (error) {
+          setGanttExportNotice(error.message);
+        } finally {
+          setGanttExporting(false);
+        }
+      };
+
+      const handleSend = async (event, promptOverride = "") => {
+        event?.preventDefault();
+        const userQuery = (promptOverride || input).trim();
+        if (!userQuery || loading || !activeProject) return;
         setInput("");
         setLoading(true);
+        setNotice("");
+        setStatus("Saving your question...");
 
         try {
-          // 1. GUARDRAIL CHECK (Sentiment + Security Patterns)
-          setStatus("Running Guardrails Check...");
-          
-          const maliciousPattern = /(scam|hack|exploit|drop\s+table|delete\s+from|insert\s+into|alter\s+table|<script>|bypass|override|crack)/i;
-          if (maliciousPattern.test(userQuery)) {
-            setMessages(prev => [...prev, { 
-              sender: "bot", 
-              text: "🛡️ [Guardrail Triggered]: Request blocked due to security or policy restrictions. Please ask a valid business question." 
-            }]);
-            setLoading(false);
-            setStatus("Ready");
-            return;
-          }
-
-          if (/(hate|stupid|bad|useless|dumb|garbage)/i.test(userQuery)) {
-            setMessages(prev => [...prev, { 
-              sender: "bot", 
-              text: "🛡️ [Guardrail Triggered]: Please keep queries professional and constructive." 
-            }]);
-            setLoading(false);
-            setStatus("Ready");
-            return;
-          }
-
-          // 2. SUPABASE DATA QUERY & SUMMARIZATION
-          const isBusinessQuery = /(sales|product|inventory|order|business|store|item|stock)/i.test(userQuery);
-
-          if (isBusinessQuery) {
-            setStatus("Fetching Supabase Data...");
-            const [{ data: products, error: productsError }, { data: orders, error: ordersError }] = await Promise.all([
-              supabase.from('products').select('*'),
-              supabase.from('orders').select('*')
-            ]);
-
-            if (productsError) throw new Error(`Products query failed: ${productsError.message}`);
-            if (ordersError) throw new Error(`Orders query failed: ${ordersError.message}`);
-
-            const rawDataString = `
-Database State:
-Products In Stock: ${JSON.stringify(products || [])}
-Orders History: ${JSON.stringify(orders || [])}
-`;
-
-            setStatus("Analyzing Supabase Data...");
-            if (!pipelinesRef.current.generate) {
-              pipelinesRef.current.generate = await getPipeline('text-generation', TINA_MODEL_ID);
-            }
-
-            const analyticsPrompt = [
-              "<|im_start|>system",
-              "You are Tina, a concise business analytics assistant. Analyze only the supplied Supabase data. Do not invent values. Mention when data is missing.",
-              "<|im_end|>",
-              "<|im_start|>user",
-              `Question: ${userQuery}\n\n${rawDataString}`,
-              "<|im_end|>",
-              "<|im_start|>assistant"
-            ].join("\n");
-            const summaryOutput = await pipelinesRef.current.generate(analyticsPrompt, {
-              max_new_tokens: 140,
-              temperature: 0.2,
-              do_sample: false,
-              return_full_text: false
-            });
-
-            const cleanFormattedSummary = summaryOutput[0].generated_text
-              .replace(/<\|im_end\|>[\s\S]*$/, "")
-              .trim();
-            const finalBotResponse = `Supabase analytics:\n\n${cleanFormattedSummary}`;
-
-            setMessages(prev => [...prev, { 
-              sender: "bot", 
-              text: finalBotResponse 
-            }]);
-
+          let savedUserMessage;
+          if (demoMode) {
+            savedUserMessage = { id: createDemoId(), project_id: activeProject.id, role: "user", content: userQuery, created_at: new Date().toISOString() };
+            updateDemoWorkspace(workspace => workspace.messages.push(savedUserMessage));
           } else {
-            // 3. CONVERSATIONAL TEXT GENERATION (Fine-tuned Qwen ONNX model)
-            setStatus("Generating Conversational Response...");
-            if (!pipelinesRef.current.generate) {
-              pipelinesRef.current.generate = await getPipeline('text-generation', TINA_MODEL_ID);
-            }
-
-            const prompt = [
-              "<|im_start|>system",
-              "You are Tina, an AI business assistant for HealthyLifePhil. Provide helpful, polite and concise answers.",
-              "<|im_end|>",
-              "<|im_start|>user",
-              userQuery,
-              "<|im_end|>",
-              "<|im_start|>assistant"
-            ].join("\n");
-            const genOutput = await pipelinesRef.current.generate(prompt, {
-              max_new_tokens: 60,
-              temperature: 0.7,
-              do_sample: true,
-              return_full_text: false
-            });
-
-            let cleanResponse = genOutput[0].generated_text
-              .replace(/<\|im_end\|>[\s\S]*$/, "")
-              .trim();
-
-            if (!cleanResponse || cleanResponse.length < 3) {
-              cleanResponse = "Hello! I am Tina, your HealthyLifePhil business assistant. Ask me about inventory, sales analytics, or order status!";
-            }
-
-            setMessages(prev => [...prev, { 
-              sender: "bot", 
-              text: cleanResponse 
-            }]);
+            const { data, error } = await supabase.from("project_messages")
+              .insert({ project_id: activeProject.id, role: "user", content: userQuery })
+              .select().single();
+            if (error) throw error;
+            savedUserMessage = data;
           }
 
-          setStatus("Ready");
-        } catch (err) {
-          console.error(err);
-          setMessages(prev => [...prev, { 
-            sender: "bot", 
-            text: `⚠️ Error processing request: ${err.message}` 
+          const userMessage = { id: savedUserMessage.id, sender: "user", text: savedUserMessage.content };
+          const history = [...messages, userMessage].slice(-10).map(message =>
+            `${message.sender === "user" ? "<|im_start|>user" : "<|im_start|>assistant"}\n${message.text}\n<|im_end|>`
+          ).join("\n");
+          setMessages(previous => [...previous, userMessage]);
+
+          const projectContext = [
+            `Project: ${activeProject.title}`,
+            `Summary: ${activeProject.summary || "Not provided."}`,
+            `Technology stack: ${(activeProject.tech_stack || []).join(", ") || "Not provided."}`,
+            `Requirements: ${requirements.map(item => `- [${item.status}] ${item.description}`).join("\n") || "None added yet."}`,
+            `Milestones and timeline: ${milestones.map(item => `- [${item.status}] ${item.title}${item.start_date && item.due_date ? ` (${item.start_date} to ${item.due_date})` : item.due_date ? ` (finish ${item.due_date}; start date not set)` : ""}`).join("\n") || "None added yet."}`
+          ].join("\n").slice(0, 10000);
+          const prompt = [
+            "<|im_start|>system",
+            "You are Tina Build Coach, a patient project companion for a third-year BSIT student. Help the student understand and build their own project, break work into manageable steps, and prepare to explain their decisions. Use the supplied project context and conversation for continuity. Do not claim work is complete unless the student says so. If details are missing, ask a focused question. Keep technical advice clear and appropriately cautious.",
+            `Student project context:\n${projectContext}`,
+            "<|im_end|>",
+            history,
+            "<|im_start|>assistant"
+          ].join("\n");
+
+          setStatus("Tina is thinking...");
+          const generate = await getPipeline();
+          const output = await generate(prompt, {
+            max_new_tokens: 384,
+            temperature: 0.65,
+            do_sample: true,
+            return_full_text: false
+          });
+          const responseText = output[0].generated_text
+            .replace(/<\|im_end\|>[\s\S]*$/, "")
+            .trim();
+          if (!responseText) throw new Error("Tina returned an empty reply. Try asking in a different way.");
+
+          let savedAssistantMessage;
+          if (demoMode) {
+            savedAssistantMessage = { id: createDemoId(), project_id: activeProject.id, role: "assistant", content: responseText, created_at: new Date().toISOString() };
+            updateDemoWorkspace(workspace => workspace.messages.push(savedAssistantMessage));
+          } else {
+            const { data, error } = await supabase.from("project_messages")
+              .insert({ project_id: activeProject.id, role: "assistant", content: responseText })
+              .select().single();
+            if (error) throw error;
+            savedAssistantMessage = data;
+          }
+          setMessages(previous => [...previous, {
+            id: savedAssistantMessage.id,
+            sender: "bot",
+            text: savedAssistantMessage.content
           }]);
-          setStatus("Failed");
+          setStatus("Ready");
+        } catch (error) {
+          console.error(error);
+          setNotice(error.message);
+          setStatus("Reply failed");
         } finally {
           setLoading(false);
         }
       };
 
-      return (
-        <div className="flex h-screen bg-slate-950 text-white">
-          <div className="w-64 bg-slate-900 p-4 border-r border-slate-800 flex flex-col justify-between hidden md:flex">
-            <div>
-              <h1 className="text-md font-bold text-white mb-1">HealthyLifePhil</h1>
-              <p className="text-xs text-emerald-400">AI Assistant Engine</p>
-            </div>
-            <div className="text-xs text-slate-500">Connected to Supabase DB</div>
-          </div>
-
-          <div className="flex-1 flex flex-col">
-            <header className="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center text-sm font-semibold">
-              <span>Tina — Business Analysis Chatbot</span>
-              <span className="text-xs text-emerald-400">{status}</span>
-            </header>
-
-            <div className="flex-1 p-6 overflow-y-auto space-y-4">
-              {messages.map((m, index) => (
-                <div key={index} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`p-4 rounded-xl max-w-lg text-sm whitespace-pre-wrap ${
-                    m.sender === 'user' ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-200 border border-slate-700'
-                  }`}>
-                    {m.text}
-                  </div>
+      if (!user) {
+        return (
+          <main className="min-h-screen bg-slate-950 px-5 py-10 text-slate-100">
+            <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-5xl overflow-hidden rounded-lg border border-slate-800 bg-slate-900 md:grid-cols-[1.05fr_0.95fr]">
+              <section className="flex flex-col justify-between bg-emerald-950 p-8 md:p-12">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-emerald-300">Tina / Student Project Studio</p>
+                  <h1 className="mt-16 max-w-md text-4xl font-semibold leading-tight text-white">Build it. Understand it. Defend it.</h1>
+                  <p className="mt-5 max-w-md text-sm leading-6 text-emerald-100">A project coach that keeps your requirements, milestones, and conversations together while you build.</p>
                 </div>
-              ))}
-              {loading && <div className="text-xs text-emerald-400 italic animate-pulse">Tina is processing request...</div>}
+                <p className="mt-16 text-xs text-emerald-300">Your project workspace is private to your account.</p>
+              </section>
+              <section className="flex items-center p-6 md:p-12">
+                <form onSubmit={handleAuth} className="w-full space-y-5">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400">{authMode === "sign_up" ? "Create your workspace" : "Welcome back"}</p>
+                    <h2 className="mt-2 text-2xl font-semibold text-white">{authMode === "sign_up" ? "Create account" : "Sign in"}</h2>
+                  </div>
+                  <label className="block text-sm text-slate-300">Email
+                    <input required type="email" autoComplete="email" value={authEmail} onChange={event => setAuthEmail(event.target.value)} className="mt-2 w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-3 text-white outline-none focus:border-emerald-500" />
+                  </label>
+                  <div className="block text-sm text-slate-300">
+                    <label htmlFor="auth-password">Password</label>
+                    <span className="relative mt-2 block">
+                      <input id="auth-password" required type={showPassword ? "text" : "password"} minLength="6" autoComplete={authMode === "sign_up" ? "new-password" : "current-password"} value={authPassword} onChange={event => setAuthPassword(event.target.value)} className="w-full rounded-md border border-slate-700 bg-slate-950 px-3 py-3 pr-12 text-white outline-none focus:border-emerald-500" />
+                      <button type="button" aria-label={showPassword ? "Hide password" : "Show password"} aria-pressed={showPassword} title={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword(value => !value)} className="absolute inset-y-0 right-0 rounded-r-md px-3 text-slate-400 hover:text-emerald-300 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-emerald-500">
+                        <span aria-hidden="true">&#128065;&#65038;</span>
+                      </button>
+                    </span>
+                  </div>
+                  {authNotice && <p role="status" className="text-sm text-amber-300">{authNotice}</p>}
+                  <button disabled={authBusy} className="w-full rounded-md bg-emerald-400 px-4 py-3 font-semibold text-slate-950 hover:bg-emerald-300 disabled:opacity-50">
+                    {authBusy ? "Please wait..." : authMode === "sign_up" ? "Create account" : "Sign in"}
+                  </button>
+                  <div className="border-t border-slate-800 pt-4">
+                    <button type="button" onClick={startDemo} className="w-full rounded-md border border-slate-600 px-4 py-3 text-sm font-semibold text-slate-100 hover:border-emerald-400 hover:text-emerald-300">Try the demo workspace</button>
+                    <p className="mt-2 text-center text-xs text-slate-500">Sample project, no account needed. Demo edits stay in this browser.</p>
+                  </div>
+                  <p className="text-sm text-slate-400">
+                    {authMode === "sign_up" ? "Already have an account?" : "New to Tina Build Coach?"}{" "}
+                    <button type="button" onClick={() => { setAuthMode(authMode === "sign_up" ? "sign_in" : "sign_up"); setAuthNotice(""); }} className="font-medium text-emerald-300 hover:text-emerald-200">
+                      {authMode === "sign_up" ? "Sign in" : "Create one"}
+                    </button>
+                  </p>
+                </form>
+              </section>
             </div>
+          </main>
+        );
+      }
 
-            <div className="p-4 bg-slate-900 border-t border-slate-800 flex gap-2">
-              <input
-                type="text"
-                className="flex-1 p-3 rounded-lg bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-500"
-                placeholder="Ask about sales, products, inventory, or chat naturally..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              />
-              <button 
-                onClick={handleSend} 
-                disabled={loading} 
-                className="bg-emerald-600 hover:bg-emerald-500 px-5 py-2 rounded-lg font-bold text-sm text-black transition-colors disabled:opacity-50"
-              >
-                Send
-              </button>
+      const StatusSelect = ({ value, onChange }) => (
+        <select value={value} onChange={event => onChange(event.target.value)} className="rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-300">
+          <option value="not_started">Not started</option>
+          <option value="in_progress">In progress</option>
+          <option value="done">Done</option>
+        </select>
+      );
+
+      const ganttTimeline = window.GanttTools.buildTimeline(milestones);
+      const scheduledMilestones = ganttTimeline.activities;
+      const timelineTicks = ganttTimeline.ticks;
+      const formatPlanDate = date => window.GanttTools.formatDate(date, navigator.language);
+
+      return (
+        <div className="app-shell flex h-dvh min-h-0 overflow-hidden bg-slate-950 text-slate-100">
+          {activeSection !== "coach" && <aside className="hidden w-72 shrink-0 flex-col border-r border-slate-800 bg-slate-900 lg:flex">
+            <div className="border-b border-slate-800 px-5 py-5">
+              <p className="text-xs font-bold uppercase tracking-widest text-emerald-400">Tina / Build Coach</p>
+              <p className="mt-1 text-xs text-slate-500">{demoMode ? "Demo workspace · local only" : "Student Project Studio"}</p>
             </div>
-          </div>
+            <div className="flex items-center justify-between px-4 pb-2 pt-5">
+              <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Your projects</span>
+              <button onClick={() => { setActiveProject(null); setNotice(""); }} className="rounded border border-slate-700 px-2 py-1 text-xs text-emerald-300 hover:border-emerald-500">+ New</button>
+            </div>
+            <nav className="flex-1 space-y-1 overflow-y-auto px-3">
+              {projects.map(project => (
+                <button key={project.id} onClick={() => openProject(project)} className={`w-full rounded-md px-3 py-3 text-left ${activeProject?.id === project.id ? "bg-slate-800 text-white" : "text-slate-400 hover:bg-slate-800/60 hover:text-white"}`}>
+                  <span className="block truncate text-sm font-medium">{project.title}</span>
+                  <span className="mt-1 block truncate text-xs text-slate-500">{project.tech_stack?.join(", ") || "Project workspace"}</span>
+                </button>
+              ))}
+              {!projects.length && <p className="px-3 py-4 text-xs leading-5 text-slate-500">Your saved projects will appear here.</p>}
+            </nav>
+            <div className="border-t border-slate-800 p-4">
+              <p className="truncate text-xs text-slate-400">{user.email}</p>
+              <button onClick={handleSignOut} className="mt-2 text-xs text-slate-500 hover:text-white">{demoMode ? "Exit demo" : "Sign out"}</button>
+            </div>
+          </aside>}
+
+          <main className="flex min-h-0 min-w-0 flex-1 flex-col">
+            {activeSection !== "coach" && <header className="flex min-h-16 items-center justify-between gap-3 border-b border-slate-800 bg-slate-900 px-4 py-3 md:px-6">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400 lg:hidden">Tina / Build Coach</p>
+                <h1 className="truncate text-sm font-semibold text-white">{activeProject?.title || "Project workspace"}</h1>
+              </div>
+              <div className="flex items-center gap-3">
+                <button onClick={() => { setActiveProject(null); setNotice(""); }} className="rounded border border-slate-700 px-2 py-2 text-xs text-emerald-300 hover:border-emerald-500 lg:hidden">+ New</button>
+                <select aria-label="Choose project" value={activeProject?.id || ""} onChange={event => {
+                  const selected = projects.find(project => project.id === event.target.value);
+                  if (selected) openProject(selected);
+                }} className="max-w-40 rounded border border-slate-700 bg-slate-950 px-2 py-2 text-xs text-slate-300 lg:hidden">
+                  <option value="">Projects</option>
+                  {projects.map(project => <option key={project.id} value={project.id}>{project.title}</option>)}
+                </select>
+                <span className="hidden text-xs text-slate-400 sm:inline">{status}</span>
+                <button onClick={handleSignOut} className="rounded border border-slate-700 px-3 py-2 text-xs text-slate-300 hover:border-slate-500 lg:hidden">{demoMode ? "Exit demo" : "Exit"}</button>
+              </div>
+            </header>}
+
+            {activeSection !== "coach" && activeProject && <nav aria-label="Project sections" className="flex gap-1 overflow-x-auto border-b border-slate-800 bg-slate-900 px-4 md:px-6">
+              {[ ["overview", "Overview", "◉"], ["plan", "Build plan", "▤"], ["coach", "Tina", "✦"] ].map(([section, label, icon]) => (
+                <button key={section} type="button" aria-current={activeSection === section ? "page" : undefined} onClick={() => setActiveSection(section)} className={`garden-sweep shrink-0 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${activeSection === section ? "border-emerald-400 text-emerald-300" : "border-transparent text-slate-400 hover:text-white"}`}>
+                  <span className="flex items-center gap-2"><span aria-hidden="true" className="garden-nav-icon"><span className="garden-icon-glyph">{icon}</span></span><span>{label}</span></span>
+                  {section === "plan" && <span className="ml-2 inline-flex min-w-5 justify-center rounded-full bg-slate-800 px-1.5 py-0.5 text-[10px] opacity-80">{requirements.length + milestones.length}</span>}
+                </button>
+              ))}
+            </nav>}
+
+            {activeSection !== "coach" && notice && <div role="alert" className="border-b border-amber-900 bg-amber-950/60 px-4 py-2 text-sm text-amber-200">{notice}</div>}
+            {activeSection !== "coach" && demoMode && <div role="status" className="border-b border-emerald-900 bg-emerald-950/60 px-4 py-2 text-xs text-emerald-200">Demo workspace: changes are saved only in this browser and do not affect Supabase.</div>}
+
+            {!activeProject ? (
+              <div className="flex-1 overflow-y-auto p-5 md:p-8">
+                <div className="mx-auto grid max-w-5xl gap-8 xl:grid-cols-[1fr_0.8fr]">
+                  <section>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-emerald-400">Start with the brief</p>
+                    <h2 className="mt-2 text-3xl font-semibold text-white">Set up your project</h2>
+                    <p className="mt-3 max-w-xl text-sm leading-6 text-slate-400">Drop in the proposal or rubric you already have. Tina turns it into a working Project Twin, then asks only for details the brief leaves out.</p>
+                    <form onSubmit={handleCreateProject} className="mt-7 space-y-4 rounded-md border border-slate-800 bg-slate-900 p-5">
+                      <label className="block text-sm text-slate-300">Project title
+                        <input required maxLength="160" value={projectTitle} onChange={event => setProjectTitle(event.target.value)} placeholder="Auto-filled from your brief, or enter a title" className="mt-2 w-full rounded border border-slate-700 bg-slate-950 px-3 py-3 text-white outline-none focus:border-emerald-500" />
+                      </label>
+                      <label className="block text-sm text-slate-300">Project proposal or rubric <span className="font-normal text-slate-500">(optional)</span>
+                        <input type="file" accept=".pdf,.docx,.txt,.md,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown" onChange={handleBriefUpload} className="mt-2 block w-full cursor-pointer rounded border border-slate-700 bg-slate-950 text-sm text-slate-300 file:mr-3 file:border-0 file:bg-slate-800 file:px-3 file:py-3 file:text-slate-200" />
+                        <span className="mt-2 block text-xs leading-5 text-slate-500">PDF, Word, or text file up to 8 MB. Text is extracted in your browser and saved as this project’s private context.</span>
+                      </label>
+                      {briefStatus && <p role="status" className="text-sm text-emerald-300">{briefStatus}</p>}
+                      {briefFileName && <p className="text-xs text-slate-400">Attached: {briefFileName}</p>}
+                      <details className="rounded border border-slate-800 px-3 py-2">
+                        <summary className="cursor-pointer text-sm text-slate-400">Add a note or tech stack (optional)</summary>
+                        <textarea rows="3" value={projectNotes} onChange={event => setProjectNotes(event.target.value)} placeholder="Anything Tina should know right away? You can also tell Tina later in chat." className="mt-3 w-full resize-y rounded border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-white outline-none focus:border-emerald-500" />
+                        <input value={projectStack} onChange={event => setProjectStack(event.target.value)} placeholder="Tech stack, if already chosen (optional)" className="mt-2 w-full rounded border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-white outline-none focus:border-emerald-500" />
+                      </details>
+                      <button disabled={savingProject} className="rounded bg-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 hover:bg-emerald-300 disabled:opacity-50">
+                        {savingProject ? "Creating..." : "Create project"}
+                      </button>
+                    </form>
+                  </section>
+                  <section className="xl:pt-10">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">Saved work</p>
+                    <h3 className="mt-2 text-lg font-semibold text-white">{projects.length ? "Reopen a project" : "Your project list is empty"}</h3>
+                    <div className="mt-4 space-y-2">
+                      {projects.map(project => (
+                        <button key={project.id} onClick={() => openProject(project)} className="w-full rounded-md border border-slate-800 bg-slate-900 p-4 text-left hover:border-emerald-700">
+                          <span className="block font-medium text-white">{project.title}</span>
+                          <span className="mt-1 block text-sm text-slate-400">{project.summary?.slice(0, 180) || "No brief added yet. Tina can learn as you chat."}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+                </div>
+              </div>
+            ) : (
+              <div className="min-h-0 flex-1 overflow-y-auto">
+                {activeSection === "overview" && <section className="mx-auto max-w-5xl space-y-8 p-5 md:p-8">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div><p className="text-xs font-semibold uppercase tracking-widest text-emerald-400">Project overview</p><h2 className="mt-2 text-2xl font-semibold text-white">{activeProject.title}</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">A quick view of your project context and progress. Head to Build plan to update tasks, or Tina to think through your next decision.</p></div>
+                    <button type="button" onClick={() => setActiveSection("coach")} className="garden-sweep rounded bg-emerald-400 px-4 py-2.5 text-sm font-semibold text-slate-950 hover:bg-emerald-300"><span>Ask Tina</span></button>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    {[ ["Requirements", requirements.filter(item => item.status === "done").length, requirements.length, "complete"], ["Milestones", milestones.filter(item => item.status === "done").length, milestones.length, "done"], ["Conversation", messages.length, "", "messages"] ].map(([label, count, total, suffix]) => (
+                      <button key={label} type="button" onClick={() => setActiveSection(label === "Conversation" ? "coach" : "plan")} className="rounded-md border border-slate-800 bg-slate-900 p-4 text-left transition-colors hover:border-emerald-700">
+                        <span className="text-sm text-slate-400">{label}</span><span className="mt-2 block text-2xl font-semibold text-white">{count}{total !== "" && <span className="text-base font-normal text-slate-500"> / {total}</span>}</span><span className="text-xs text-slate-500">{suffix}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+                    <section className="border-t border-slate-800 pt-5">
+                      <div className="flex items-center justify-between gap-3"><h3 className="font-semibold text-white">Project brief</h3><details className="relative"><summary className="cursor-pointer text-sm text-emerald-300 hover:text-emerald-200">View brief</summary><p className="absolute right-0 z-10 mt-2 max-h-64 w-[min(80vw,32rem)] overflow-y-auto whitespace-pre-wrap rounded-md border border-slate-700 bg-slate-900 p-4 text-xs leading-5 text-slate-300 shadow-xl">{activeProject.summary || "No brief attached. You can build context naturally by chatting with Tina."}</p></details></div>
+                      <div className="mt-4 flex flex-wrap gap-2">{(activeProject.tech_stack || []).map(technology => <span key={technology} className="rounded border border-slate-700 px-2 py-1 text-xs text-slate-300">{technology}</span>)}{!activeProject.tech_stack?.length && <span className="text-xs text-slate-500">No stack added</span>}</div>
+                    </section>
+                    <section className="border-t border-slate-800 pt-5"><div className="flex items-center justify-between gap-3"><h3 className="font-semibold text-white">Next milestone</h3><button type="button" onClick={() => setActiveSection("plan")} className="text-sm text-emerald-300 hover:text-emerald-200">Build plan</button></div><p className="mt-3 text-sm text-slate-300">{milestones.find(item => item.status !== "done")?.title || "No upcoming milestone yet"}</p><p className="mt-1 text-xs text-slate-500">{milestones.find(item => item.status !== "done")?.due_date ? `Due ${milestones.find(item => item.status !== "done").due_date}` : "Add a checkpoint to keep your project moving."}</p></section>
+                  </div>
+                  {!messages.length && activeProject.summary && <div className="border-t border-slate-800 pt-5"><p className="text-sm text-slate-300">Your project brief is ready for Tina.</p><button onClick={() => { setActiveSection("coach"); handleSend(null, "Read my saved project brief and create my Project Twin. Summarize the goal, target users, stated requirements, technologies, risks, and assumptions. Separate facts from guesses, then ask only the single most important question the brief leaves unanswered."); }} className="mt-3 text-sm font-medium text-emerald-300 hover:text-emerald-200">Analyze brief <span aria-hidden="true">-&gt;</span></button></div>}
+                </section>}
+
+                {activeSection === "plan" && <section className="mx-auto max-w-5xl space-y-8 p-5 md:p-8">
+                  <div><p className="text-xs font-semibold uppercase tracking-widest text-emerald-400">Project planning</p><h2 className="mt-2 text-2xl font-semibold text-white">Build plan</h2><p className="mt-2 text-sm text-slate-400">Add activities and dates. Your Gantt timeline and milestone list update automatically.</p></div>
+                  <section className="gantt-chart rounded-md border border-slate-800 p-4 md:p-5" data-template={ganttPreferences.template} style={{ "--gantt-accent": ganttPreferences.color }}>
+                    <div className="flex flex-wrap items-end justify-between gap-4"><div><h3 className="font-semibold">Gantt timeline</h3><p className="mt-1 text-xs" style={{ color: "var(--gantt-muted)" }}>{scheduledMilestones.length} of {milestones.length} activities scheduled</p></div><div className="flex flex-wrap items-end gap-2">
+                      <label className="grid gap-1 text-xs font-medium">Template<select aria-label="Gantt chart template" value={ganttPreferences.template} onChange={event => updateGanttPreference("template", event.target.value)} className="rounded border border-slate-700 bg-slate-900 px-2 py-2 text-xs text-slate-300">{Object.entries(window.GanttTools.templates).map(([value, template]) => <option key={value} value={value}>{template.label}</option>)}</select></label>
+                      <label className="grid gap-1 text-xs font-medium">Bar color<input aria-label="Gantt bar color" type="color" value={ganttPreferences.color} onChange={event => updateGanttPreference("color", event.target.value)} className="h-9 w-12 cursor-pointer rounded border border-slate-700 bg-slate-900 p-1" /></label>
+                      <button type="button" className="gantt-download rounded bg-slate-700 px-3 py-2 text-xs font-semibold text-slate-950 hover:bg-slate-600" disabled={!scheduledMilestones.length || ganttExporting} onClick={() => downloadGantt("svg")}>Download SVG</button>
+                      <button type="button" className="gantt-download rounded bg-slate-700 px-3 py-2 text-xs font-semibold text-slate-950 hover:bg-slate-600" disabled={!scheduledMilestones.length || ganttExporting} onClick={() => downloadGantt("png")}>Download PNG</button>
+                    </div></div>
+                    {ganttExportNotice && <p role="status" className="mt-3 text-xs" style={{ color: "var(--gantt-muted)" }}>{ganttExportNotice}</p>}
+                    {scheduledMilestones.length ? <div role="img" aria-label={`Gantt timeline for ${scheduledMilestones.length} scheduled activities`} className="mt-5 space-y-3">
+                      <div className="grid grid-cols-[minmax(90px,0.8fr)_minmax(0,1.6fr)] items-end gap-3 border-b border-slate-800 pb-2"><span className="text-xs font-medium">Activity</span><div className="relative h-5">{timelineTicks.map(tick => <span key={tick.date} className="absolute top-0 whitespace-nowrap text-[10px]" style={{ color: "var(--gantt-muted)", left: `${tick.position}%`, transform: tick.position === 100 ? "translateX(-100%)" : tick.position === 0 ? "none" : "translateX(-50%)" }}>{formatPlanDate(tick.date)}</span>)}</div></div>
+                      {scheduledMilestones.map(milestone => <div key={milestone.id} className="grid grid-cols-[minmax(90px,0.8fr)_minmax(0,1.6fr)] items-center gap-3"><span className="truncate text-xs font-medium" style={{ color: "var(--gantt-ink)" }} title={milestone.title}>{milestone.title}</span><div className="gantt-track"><span className="gantt-bar" style={{ left: `${milestone.left}%`, width: `${milestone.width}%` }} title={`${milestone.title}: ${formatPlanDate(milestone.start_date)} to ${formatPlanDate(milestone.due_date)}`} /></div></div>)}
+                    </div> : <div className="mt-5 rounded border border-dashed border-slate-700 px-4 py-6 text-center"><p className="text-sm font-medium">Your timeline will appear here</p><p className="mt-1 text-xs" style={{ color: "var(--gantt-muted)" }}>Add an activity with start and finish dates to generate the chart.</p></div>}
+                  </section>
+                  <section className="border-t border-slate-800 pt-5">
+                    <div className="flex flex-wrap items-center justify-between gap-3"><div><h3 className="font-semibold text-white">Activities & milestones</h3><p className="mt-1 text-xs text-slate-500">Each activity becomes a milestone on your project timeline.</p></div><span className="text-xs text-slate-400">{milestones.filter(item => item.status === "done").length}/{milestones.length} complete</span></div>
+                    <form onSubmit={addMilestone} className="mt-4 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto]"><input required value={milestoneDraft} onChange={event => setMilestoneDraft(event.target.value)} maxLength="200" placeholder="Activity, e.g. Interview users" aria-label="Activity name" className="min-w-0 rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500" /><input required aria-label="Activity start date" type="date" max={dueDateDraft || undefined} value={startDateDraft} onChange={event => setStartDateDraft(event.target.value)} className="min-w-0 rounded border border-slate-700 bg-slate-900 px-2 py-2 text-xs text-slate-300" /><input required aria-label="Activity finish date" type="date" min={startDateDraft || undefined} value={dueDateDraft} onChange={event => setDueDateDraft(event.target.value)} className="min-w-0 rounded border border-slate-700 bg-slate-900 px-2 py-2 text-xs text-slate-300" /><button className="rounded bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300">Add activity</button></form>
+                    <div className="mt-3 space-y-2">{milestones.map(milestone => <div key={milestone.id} className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 py-3"><div className="min-w-0 flex-1"><p className="text-sm text-slate-200">{milestone.title}</p><p className="mt-1 text-xs text-slate-500">{milestone.start_date && milestone.due_date ? `${formatPlanDate(milestone.start_date)} - ${formatPlanDate(milestone.due_date)}` : milestone.due_date ? `Finish ${formatPlanDate(milestone.due_date)} · start date not set` : "Dates not set"}</p><details className="mt-1"><summary className="cursor-pointer text-xs font-medium text-emerald-300">{milestone.start_date && milestone.due_date ? "Edit dates" : "Set dates"}</summary><form onSubmit={event => updateMilestoneSchedule(event, milestone)} className="mt-2 grid gap-2 sm:grid-cols-[auto_auto_auto]"><input required name="start_date" aria-label={`Start date for ${milestone.title}`} type="date" defaultValue={milestone.start_date || ""} className="min-w-0 rounded border border-slate-700 bg-slate-900 px-2 py-2 text-xs text-slate-300" /><input required name="due_date" aria-label={`Finish date for ${milestone.title}`} type="date" defaultValue={milestone.due_date || ""} className="min-w-0 rounded border border-slate-700 bg-slate-900 px-2 py-2 text-xs text-slate-300" /><button className="w-fit rounded bg-slate-700 px-3 py-2 text-xs font-semibold text-slate-950 hover:bg-slate-600">Save dates</button></form></details></div><StatusSelect value={milestone.status} onChange={value => updateMilestoneStatus(milestone, value)} /></div>)}{!milestones.length && <p className="py-2 text-sm text-slate-500">Add your first activity to create a timeline.</p>}</div>
+                  </section>
+                  <section className="border-t border-slate-800 pt-5">
+                    <div className="flex items-center justify-between gap-3"><h3 className="font-semibold text-white">Requirements</h3><span className="text-xs text-slate-400">{requirements.filter(item => item.status === "done").length}/{requirements.length} complete</span></div>
+                    <form onSubmit={addRequirement} className="mt-4 flex gap-2"><input value={requirementDraft} onChange={event => setRequirementDraft(event.target.value)} maxLength="4000" placeholder="Add a requirement" className="min-w-0 flex-1 rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500" /><button className="rounded bg-slate-700 px-3 py-2 text-sm text-white hover:bg-slate-600">Add</button></form>
+                    <div className="mt-3 space-y-2">{requirements.map(requirement => <div key={requirement.id} className="flex items-start justify-between gap-3 border-b border-slate-800 py-3"><p className="text-sm leading-5 text-slate-300">{requirement.description}</p><StatusSelect value={requirement.status} onChange={value => updateRequirementStatus(requirement, value)} /></div>)}{!requirements.length && <p className="py-2 text-sm text-slate-500">Add a requirement to start your traceability checklist.</p>}</div>
+                  </section>
+                </section>}
+
+                {activeSection === "coach" && <section className="flex h-full min-h-0 flex-col">
+                  <div className="border-b border-slate-800 px-5 py-4"><div className="mx-auto flex max-w-5xl items-center gap-4"><button type="button" onClick={() => setActiveSection("overview")} aria-label="Back to project overview" title="Back to project overview" className="garden-sweep flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-lg text-slate-300 hover:border-emerald-400 hover:text-emerald-300"><span className="garden-icon-glyph" aria-hidden="true">&#8592;</span></button><div className="min-w-0"><p className="text-xs font-semibold uppercase tracking-widest text-emerald-400">Project conversation</p><h2 className="truncate font-semibold text-white">{activeProject.title}</h2></div></div></div>
+                  {notice && <div role="alert" className="border-b border-amber-900 bg-amber-950/60 px-5 py-2 text-sm text-amber-200">{notice}</div>}
+                  <div className="flex flex-wrap gap-2 border-b border-slate-800 px-5 py-3"><div className="mx-auto flex w-full max-w-5xl flex-wrap gap-2">
+                    {[["Next step", "What should I build next for this project?"], ["Spot risks", "What are the biggest risks or unknowns in this project?"], ["Practice defense", "Ask me one mock project defense question."]].map(([label, prompt]) => <button key={label} type="button" disabled={loading} onClick={event => handleSend(event, prompt)} className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-300 hover:border-emerald-400 hover:text-emerald-300 disabled:opacity-50">{label}</button>)}
+                  </div></div>
+                  <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5"><div className="mx-auto w-full max-w-5xl space-y-4">
+                    {!messages.length && <div className="max-w-md"><p className="text-sm font-medium text-white">{activeProject.summary ? "Your Project Twin is ready to build." : "Start with your next decision."}</p><p className="mt-2 text-sm leading-5 text-slate-400">{activeProject.summary ? "Tina can map the brief into goals, requirements, risks, and the one thing you should clarify next." : "Tell Tina what you are building in your own words. No setup checklist required."}</p>{activeProject.summary && <button onClick={() => handleSend(null, "Read my saved project brief and create my Project Twin. Summarize the goal, target users, stated requirements, technologies, risks, and assumptions. Separate facts from guesses, then ask only the single most important question the brief leaves unanswered.")} className="mt-4 rounded bg-emerald-400 px-3 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300">Analyze my brief</button>}</div>}
+                    {messages.map((message, index) => <div key={message.id || index} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}><div className={`max-w-[90%] whitespace-pre-wrap rounded-md px-4 py-3 text-sm leading-6 ${message.sender === "user" ? "bg-emerald-700 text-white" : "border border-slate-800 bg-slate-900 text-slate-200"}`}><p className="mb-1 text-[10px] font-semibold uppercase tracking-widest opacity-60">{message.sender === "user" ? "You" : "Tina"}</p>{message.text}</div></div>)}
+                    {loading && <p className="text-xs text-emerald-300">Tina is working through the project context...</p>}<div ref={chatEndRef} />
+                  </div></div>
+                  <form onSubmit={handleSend} className="border-t border-slate-800 bg-slate-900 p-4"><div className="mx-auto w-full max-w-5xl"><textarea rows="2" value={input} onChange={event => setInput(event.target.value)} onKeyDown={event => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); event.currentTarget.form.requestSubmit(); } }} placeholder="Ask about your project, requirements, or next step..." className="w-full resize-y rounded border border-slate-700 bg-slate-950 px-3 py-3 text-sm text-white outline-none focus:border-emerald-500" /><div className="mt-2 flex items-center justify-between gap-3"><span className="text-xs text-slate-500">Enter to send, Shift+Enter for a new line</span><button disabled={loading || !input.trim()} className="rounded bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-emerald-300 disabled:opacity-50">Send to Tina</button></div></div></form>
+                </section>}
+              </div>
+            )}
+          </main>
         </div>
       );
     }
