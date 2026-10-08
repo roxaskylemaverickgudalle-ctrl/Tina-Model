@@ -9,20 +9,95 @@
   background: var(--gantt-surface);
 }
 
-.gantt-chart[data-template="sky"] {
-  --gantt-surface: #eef7fa;
-  --gantt-track: #dcebf0;
-  --gantt-grid: #b9d4dd;
-  --gantt-ink: #193b4a;
-  --gantt-muted: #315d6b;
+.gantt-chart { font-family: var(--gantt-font, Arial, sans-serif); }
+.gantt-theme-gallery { margin-bottom: 1rem; border-bottom: 1px solid var(--gantt-grid); padding-bottom: 0.75rem; }
+.gantt-theme-gallery > summary { display: flex; width: fit-content; max-width: 100%; cursor: pointer; align-items: center; gap: 0.5rem; list-style: none; color: var(--gantt-ink); font-size: 0.8rem; font-weight: 700; }
+.gantt-theme-gallery > summary::-webkit-details-marker { display: none; }
+.gantt-theme-gallery > summary::before { content: "+"; display: grid; width: 1.35rem; height: 1.35rem; place-items: center; border: 1px solid var(--gantt-grid); border-radius: 50%; color: var(--gantt-accent); font-size: 1rem; }
+.gantt-theme-gallery[open] > summary::before { content: "−"; }
+.gantt-theme-current { margin-left: 0.15rem; border-radius: 9999px; padding: 0.2rem 0.5rem; color: var(--gantt-ink); background: var(--gantt-track); font-size: 0.65rem; font-weight: 600; }
+.gantt-theme-content { padding-top: 0.9rem; }
+.gantt-theme-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.85rem; }
+.gantt-theme-filter { border: 1px solid #2d6a4f; border-radius: 9999px; padding: 0.35rem 0.85rem; color: #2d6a4f; background: #e8f5e9; font-size: 0.75rem; font-weight: 600; }
+.gantt-theme-filter:hover { border-color: #2d6a4f; color: #1b4332; background: #d9eddd; }
+.gantt-theme-filter[aria-pressed="true"] { border-color: #1b4332; color: #fff; background: #1b4332; }
+.gantt-theme-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.65rem; }
+.gantt-theme-card { position: relative; min-width: 0; border: 1px solid var(--theme-grid); border-radius: 0.45rem; padding: 0.75rem; color: var(--theme-ink); background: var(--theme-surface); text-align: left; transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease; }
+.gantt-theme-card:hover, .gantt-theme-card:focus-within { z-index: 1; border-color: var(--theme-accent); box-shadow: 0 5px 14px color-mix(in srgb, var(--theme-accent), transparent 78%); transform: translateY(-2px); }
+.gantt-theme-card[data-active="true"] { border: 2px solid var(--theme-accent); padding: calc(0.75rem - 1px); box-shadow: inset 0 0 0 1px var(--theme-accent); }
+.gantt-theme-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }
+.gantt-theme-card-title { min-width: 0; overflow-wrap: anywhere; font-size: 0.85rem; font-weight: 700; }
+.gantt-theme-badge { flex: 0 0 auto; border-radius: 9999px; padding: 0.2rem 0.45rem; color: var(--theme-ink); background: var(--theme-track); font-size: 0.6rem; font-weight: 700; }
+.gantt-theme-active { display: inline-flex; align-items: center; gap: 0.2rem; border-radius: 9999px; padding: 0.2rem 0.45rem; color: #fff; background: #1b4332; font-size: 0.6rem; font-weight: 700; }
+.gantt-theme-preview { position: relative; display: flex; height: 4.25rem; flex-direction: column; justify-content: center; gap: 0.35rem; overflow: hidden; margin-top: 0.65rem; border: 1px solid var(--theme-grid); border-radius: 0.25rem; padding: 0.5rem; background-color: var(--theme-surface); background-image: linear-gradient(to right, var(--theme-grid) 1px, transparent 1px); background-size: 25% 100%; font-family: var(--theme-font); }
+.gantt-theme-preview-row { display: flex; height: 0.45rem; align-items: center; gap: 0.28rem; }
+.gantt-theme-preview-label { width: 24%; height: 0.18rem; border-radius: 9999px; background: var(--theme-muted); opacity: 0.7; }
+.gantt-theme-preview-track { position: relative; height: 100%; flex: 1; border-radius: 9999px; background: var(--theme-track); }
+.gantt-theme-preview-bar { position: absolute; top: 0; height: 100%; border-radius: var(--theme-radius); background: var(--theme-accent); box-shadow: var(--theme-shadow, none); }
+.gantt-theme-card[data-bar-style="square"] .gantt-theme-preview-bar { border-radius: 1px; }
+.gantt-theme-card[data-bar-style="striped"] .gantt-theme-preview-bar { background-image: repeating-linear-gradient(135deg, transparent 0 3px, rgb(255 255 255 / 48%) 3px 5px); }
+.gantt-theme-card[data-bar-style="wireframe"] .gantt-theme-preview-bar { border: 1px solid var(--theme-accent); background: transparent; }
+.gantt-theme-description { min-height: 2.2rem; margin-top: 0.55rem; color: var(--theme-muted); font-size: 0.7rem; line-height: 1.1rem; }
+.gantt-theme-palette { display: flex; gap: 0.3rem; margin-top: 0.5rem; }
+.gantt-theme-swatch { width: 0.7rem; height: 0.7rem; border: 1px solid color-mix(in srgb, var(--theme-ink), transparent 72%); border-radius: 50%; }
+.gantt-theme-card-actions { display: flex; gap: 0.4rem; margin-top: 0.65rem; }
+.gantt-theme-action { flex: 1; border: 1px solid #2d6a4f; border-radius: 0.35rem; padding: 0.45rem 0.55rem; color: #1b4332; background: transparent; font-size: 0.7rem; font-weight: 700; text-align: center; }
+.gantt-theme-action:hover { background: rgb(45 106 79 / 8%); }
+.gantt-theme-action.primary { border-color: #1b4332; color: #fff; background: #1b4332; }
+.gantt-theme-action.primary:hover { border-color: #2d6a4f; background: #2d6a4f; }
+.gantt-theme-create { display: grid; min-height: 13rem; place-items: center; border: 1px dashed #7f9990; border-radius: 0.45rem; color: var(--gantt-ink); background: color-mix(in srgb, var(--gantt-track), transparent 45%); font-size: 0.8rem; font-weight: 700; }
+.gantt-theme-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 1rem; }
+.gantt-theme-preview-note { color: var(--gantt-muted); font-size: 0.7rem; }
+.gantt-custom-overlay { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; overflow-y: auto; padding: 1rem; background: rgb(12 28 25 / 56%); }
+.gantt-custom-dialog { width: min(100%, 34rem); max-height: min(90vh, 48rem); overflow-y: auto; border: 1px solid #a8c0b4; border-radius: 0.5rem; padding: 1.25rem; color: #19372b; background: #f5f8f0; box-shadow: 0 16px 48px rgb(14 37 30 / 28%); }
+.gantt-custom-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+.gantt-custom-field { display: grid; min-width: 0; gap: 0.3rem; color: #425d4b; font-size: 0.7rem; font-weight: 600; }
+.gantt-custom-field input, .gantt-custom-field select { width: 100%; min-width: 0; border: 1px solid #bed2bf; border-radius: 0.3rem; padding: 0.45rem; color: #19372b; background: #fff; }
+.gantt-custom-field input[type="color"] { height: 2.25rem; padding: 0.2rem; }
+.gantt-color-control { display: inline-flex; align-items: center; gap: 0.45rem; border: 1px solid #bed2bf; border-radius: 0.35rem; padding: 0.25rem 0.45rem; background: #f5f8f0; font-size: 0.7rem; font-weight: 600; }
+.gantt-color-control input { width: 1.5rem; height: 1.5rem; cursor: pointer; border: 0; padding: 0; background: transparent; }
+.gantt-toolbar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.gantt-color-control { display: inline-flex; align-items: center; gap: 0.45rem; border: 1px solid #bed2bf; border-radius: 0.35rem; padding: 0.25rem 0.45rem; background: #f5f8f0; font-size: 0.7rem; font-weight: 600; }
+.gantt-color-control input { width: 1.5rem; height: 1.5rem; cursor: pointer; border: 0; padding: 0; background: transparent; }
+
+.gantt-schedule {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+  gap: 0.4rem;
+  align-items: center;
 }
 
-.gantt-chart[data-template="orchard"] {
-  --gantt-surface: #f5f1df;
-  --gantt-track: #e9e1c9;
-  --gantt-grid: #d2c5a3;
-  --gantt-ink: #483e26;
-  --gantt-muted: #625735;
+.gantt-schedule-header { min-width: 0; padding: 0 0.5rem 0.5rem; border-bottom: 1px solid var(--gantt-grid); color: var(--gantt-muted); font-size: 0.625rem; font-weight: 700; text-transform: uppercase; }
+.gantt-schedule-row { display: contents; }
+.gantt-schedule-cell { min-width: 0; padding: 0.55rem 0.5rem; font-size: 0.75rem; }
+.gantt-schedule-row:nth-child(even) .gantt-schedule-cell { background: color-mix(in srgb, var(--gantt-track), transparent 48%); }
+.gantt-schedule-title { overflow: hidden; color: var(--gantt-ink); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.gantt-schedule-date { color: var(--gantt-muted); font-variant-numeric: tabular-nums; }
+.gantt-schedule-track { position: relative; height: 1.1rem; overflow: hidden; border-radius: 0.2rem; background: var(--gantt-track); }
+.gantt-schedule-bar { position: absolute; top: 0.2rem; height: 0.7rem; overflow: hidden; border-radius: 0.15rem; background: var(--gantt-accent); }
+.gantt-schedule-bar[data-critical="true"] { outline: 2px solid #c4513e; }
+.gantt-chart[data-bar-style="square"] .gantt-bar, .gantt-chart[data-bar-style="square"] .gantt-roadmap-progress i { border-radius: 1px; }
+.gantt-chart[data-bar-style="outlined"] .gantt-bar, .gantt-chart[data-bar-style="outlined"] .gantt-schedule-bar { border: 1px solid var(--gantt-accent); background: transparent; box-shadow: none; }
+.gantt-chart[data-bar-style="striped"] .gantt-bar, .gantt-chart[data-bar-style="striped"] .gantt-schedule-bar { box-shadow: 0 1px 5px color-mix(in srgb, var(--gantt-accent), transparent 55%); }
+.gantt-chart[data-bar-style="striped"] .gantt-progress-fill { background-image: repeating-linear-gradient(135deg, transparent 0 4px, rgb(255 255 255 / 55%) 4px 6px); }
+.gantt-chart[data-bar-style="wireframe"] .gantt-bar, .gantt-chart[data-bar-style="wireframe"] .gantt-schedule-bar { border: 1px solid var(--gantt-accent); background: transparent; box-shadow: none; }
+
+.gantt-roadmap { position: relative; display: grid; gap: 0.75rem; }
+.gantt-roadmap::before { position: absolute; top: 1.25rem; bottom: 1.25rem; left: 0.8rem; width: 2px; background: var(--gantt-grid); content: ""; }
+.gantt-roadmap-item { position: relative; display: grid; grid-template-columns: 1.6rem minmax(0, 1fr); gap: 0.65rem; align-items: start; }
+.gantt-roadmap-node { z-index: 1; width: 0.85rem; height: 0.85rem; margin: 0.85rem 0 0 0.4rem; border: 3px solid var(--gantt-surface); border-radius: 50%; background: var(--gantt-accent); box-shadow: 0 0 0 1px var(--gantt-grid); }
+.gantt-roadmap-card { min-width: 0; border-radius: 0.3rem; padding: 0.7rem 0.85rem; background: var(--gantt-track); }
+.gantt-roadmap-title { overflow-wrap: anywhere; color: var(--gantt-ink); font-size: 0.8rem; font-weight: 700; }
+.gantt-roadmap-meta { margin-top: 0.25rem; color: var(--gantt-muted); font-size: 0.7rem; }
+.gantt-roadmap-duration { margin-top: 0.5rem; height: 0.25rem; overflow: hidden; border-radius: 9999px; background: var(--gantt-surface); }
+.gantt-roadmap-duration i { display: block; height: 100%; border-radius: inherit; background: var(--gantt-accent); }
+.gantt-roadmap-progress { margin-top: 0.45rem; height: 0.2rem; overflow: hidden; border-radius: 9999px; background: var(--gantt-surface); }
+.gantt-roadmap-progress i { display: block; height: 100%; border-radius: inherit; background: #55a36c; }
+
+@media (max-width: 480px) {
+  .gantt-schedule { gap: 0.2rem; }
+  .gantt-schedule-cell { padding: 0.5rem 0.25rem; }
+  .gantt-schedule-date { font-size: 0.625rem; }
 }
 
 .gantt-track {
@@ -33,24 +108,113 @@
   background-color: var(--gantt-track);
   background-image: linear-gradient(to right, var(--gantt-grid) 1px, transparent 1px);
   background-size: 25% 100%;
+  touch-action: none;
 }
 
 .gantt-bar {
   position: absolute;
   top: 50%;
+  display: block;
   min-width: 0.5rem;
   height: 1.25rem;
-  border-radius: 9999px;
+  border-radius: var(--gantt-bar-radius, 9999px);
   background-color: var(--gantt-accent);
   box-shadow: inset 0 0 0 1px rgb(25 55 43 / 12%);
   transform: translateY(-50%);
-  transition: filter 140ms ease;
+  cursor: grab;
+  touch-action: none;
+  transition: filter 140ms ease, box-shadow 140ms ease;
 }
 
-.gantt-bar:hover { filter: brightness(.88); }
+.gantt-bar:hover { filter: brightness(.92); }
+.gantt-bar:active { cursor: grabbing; }
+.gantt-bar[data-critical="true"] { box-shadow: 0 0 0 2px #c4513e, inset 0 0 0 1px rgb(25 55 43 / 12%); }
+.gantt-progress-fill { position: absolute; inset: 0 auto 0 0; width: var(--bar-progress, 0%); border-radius: inherit; background: rgb(255 255 255 / 36%); pointer-events: none; }
+.gantt-resize-handle { position: absolute; z-index: 1; top: 0; width: 0.45rem; height: 100%; border: 0; border-radius: inherit; padding: 0; background: rgb(255 255 255 / 34%); cursor: ew-resize; }
+.gantt-resize-handle.start { left: 0; }
+.gantt-resize-handle.end { right: 0; }
+.gantt-progress-control { display: flex; align-items: center; gap: 0.5rem; max-width: 18rem; color: #425d4b; font-size: 0.75rem; }
+.gantt-progress-control input { min-width: 5rem; flex: 1; accent-color: #236b39; }
+.gantt-activity-options { display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem; }
+.gantt-activity-create-form input, .gantt-activity-create-form button, .gantt-activity-date-fields input, .gantt-activity-options select { box-sizing: border-box; height: 2.5rem; }
+.app-shell form.mt-4.grid input, .app-shell form.mt-4.grid > button, .app-shell form.contents input[type="date"], .app-shell .gantt-activity-options select { box-sizing: border-box; height: 2.5rem; }
+.gantt-control-row { display: grid; align-items: center; gap: 0.75rem; }
+.gantt-activity-create-form { grid-template-columns: minmax(12rem, 1fr) minmax(9rem, auto) minmax(9rem, auto) auto; }
+.gantt-control-row input, .gantt-control-row select, .gantt-control-row button,
+.gantt-activity-date-fields input, .gantt-activity-main select, .gantt-requirement-row select {
+  box-sizing: border-box;
+  width: 100%;
+  height: 2.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0 0.75rem;
+  color: #19372b;
+  background: #fff;
+  font-size: 0.875rem;
+}
+.gantt-control-row input:focus, .gantt-control-row select:focus,
+.gantt-activity-date-fields input:focus, .gantt-activity-main select:focus,
+.gantt-requirement-row select:focus { border-color: #2d6a4f; box-shadow: 0 0 0 3px rgb(45 106 79 / 14%); outline: none; }
+.gantt-control-row button { width: auto; min-width: 8rem; border-color: #1b4332; color: #fff; background: #1b4332; font-weight: 700; transition: all 200ms ease-in-out; }
+.gantt-control-row button:hover { transform: translateY(-1px); border-color: #2d6a4f; background: #2d6a4f; box-shadow: 0 4px 12px rgb(27 67 50 / 18%); }
+.gantt-control-row button:active { transform: scale(.98); }
+.gantt-activity-list, .gantt-requirement-list-cards { display: grid; gap: 0.75rem; }
+.gantt-activity-card, .gantt-requirement-card { min-width: 0; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.75rem; background: #fff; box-shadow: 0 1px 2px rgb(20 45 35 / 5%); transition: border-color 200ms ease-in-out, box-shadow 200ms ease-in-out; }
+.gantt-activity-card:hover, .gantt-requirement-card:hover { border-color: #c4d9cd; box-shadow: 0 4px 12px rgb(20 45 35 / 7%); }
+.gantt-activity-title { overflow-wrap: anywhere; color: #19372b; font-size: 0.9rem; font-weight: 700; }
+.gantt-activity-main { display: grid; grid-template-columns: minmax(10rem, 1fr) minmax(13rem, 1.35fr) minmax(10rem, 1fr) auto; align-items: center; gap: 0.75rem; }
+.gantt-activity-date-fields { display: grid; min-width: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+.gantt-field-label { display: grid; min-width: 0; gap: 0.25rem; color: #64748b; font-size: 0.65rem; font-weight: 600; }
+.gantt-dependency-control { display: grid; min-width: 0; gap: 0.25rem; color: #64748b; font-size: 0.65rem; font-weight: 600; }
+.gantt-status-select { min-width: 7.5rem; border: 1px solid transparent !important; border-radius: 9999px !important; padding: 0 0.75rem !important; font-size: 0.72rem !important; font-weight: 700 !important; }
+.gantt-status-select.status-not_started { color: #475569; background: #f1f5f9; }
+.gantt-status-select.status-in_progress { color: #854d0e; background: #fef3c7; }
+.gantt-status-select.status-done { color: #166534; background: #dcfce7; }
+.gantt-activity-card-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; margin-top: 0.75rem; border-top: 1px solid #edf1f3; padding-top: 0.65rem; }
+.gantt-activity-card-footer .gantt-requirement-links { margin-top: 0; }
+.gantt-requirement-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0.75rem; }
+.gantt-requirement-description { min-width: 0; color: #334155; font-size: 0.875rem; line-height: 1.4rem; overflow-wrap: anywhere; }
+.gantt-requirement-empty { border: 1px dashed #cbd5e1; border-radius: 0.5rem; padding: 0.75rem; color: #64748b; font-size: 0.8rem; }
+.app-shell form.mt-4.flex > button, .gantt-custom-dialog button[type="button"] { border: 1px solid #2d6a4f; color: #1b4332; background: transparent; }
+.app-shell form.mt-4.flex > button:hover, .gantt-custom-dialog button[type="button"]:hover { background: #e8f5e9; }
+.gantt-custom-dialog button[type="submit"] { border: 1px solid #1b4332; border-radius: 0.5rem; color: #fff; background: #1b4332; }
+.gantt-custom-dialog button[type="submit"]:hover { border-color: #2d6a4f; background: #2d6a4f; }
+.app-shell button[aria-label="Dismiss demo notice"] { border-radius: 9999px; color: #52615a; }
+.app-shell button[aria-label="Dismiss demo notice"]:hover { color: #8c3131; background: #f9e9e7; }
+.gantt-dependency-control { display: inline-flex; align-items: center; gap: 0.35rem; color: #425d4b; font-size: 0.7rem; }
+.gantt-requirement-links { margin-top: 0.5rem; border-radius: 0.25rem; font-size: 0.7rem; }
+.gantt-requirement-links summary { width: fit-content; cursor: pointer; color: #236b39; }
+.gantt-requirement-list { display: grid; gap: 0.4rem; margin-top: 0.5rem; }
+.gantt-requirement-list label { display: flex; gap: 0.45rem; align-items: flex-start; color: #344f3b; }
+.gantt-requirement-list input { margin-top: 0.1rem; accent-color: #236b39; }
+.gantt-critical-key { color: #a84030; font-size: 0.7rem; font-weight: 600; }
 
+.app-shell button.gantt-download { border: 1px solid #2d6a4f; color: #1b4332; background: transparent; }
+.app-shell button.gantt-download:hover:not(:disabled) { border-color: #1b4332; color: #1b4332; background: #e8f5e9; }
 .gantt-download:disabled { cursor: not-allowed; opacity: .5; }
 
 @media (prefers-reduced-motion: reduce) {
-  .gantt-bar { transition: none; }
+  .gantt-bar, .gantt-theme-card { transition: none; }
+}
+
+@media (max-width: 480px) {
+  .gantt-custom-grid { grid-template-columns: minmax(0, 1fr); }
+  .gantt-theme-card-actions { flex-wrap: wrap; }
+}
+
+@media (max-width: 760px) {
+  .gantt-activity-create-form { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .gantt-activity-create-form input:first-child { grid-column: 1 / -1; }
+  .gantt-activity-create-form button { grid-column: 1 / -1; width: 100%; }
+  .gantt-activity-main { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .gantt-activity-title { grid-column: 1 / -1; }
+  .gantt-activity-date-fields { grid-column: 1 / -1; }
+  .gantt-activity-options { grid-column: 1 / -1; }
+}
+
+@media (max-width: 420px) {
+  .gantt-activity-create-form, .gantt-activity-main { grid-template-columns: minmax(0, 1fr); }
+  .gantt-activity-create-form input:first-child, .gantt-activity-create-form button, .gantt-activity-title, .gantt-activity-date-fields, .gantt-activity-options { grid-column: auto; }
+  .gantt-activity-create-form button { width: 100%; }
+  .gantt-requirement-row { grid-template-columns: minmax(0, 1fr); }
 }
