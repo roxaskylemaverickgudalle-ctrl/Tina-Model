@@ -28,6 +28,9 @@ create table if not exists public.project_milestones (
   due_date date,
   status text not null default 'not_started'
     check (status in ('not_started', 'in_progress', 'done')),
+  progress integer not null default 0,
+  depends_on_id uuid references public.project_milestones (id) on delete set null,
+  linked_requirement_ids uuid[] not null default '{}',
   position integer not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -35,6 +38,25 @@ create table if not exists public.project_milestones (
 
 alter table public.project_milestones
   add column if not exists start_date date;
+alter table public.project_milestones
+  add column if not exists progress integer not null default 0;
+alter table public.project_milestones
+  add column if not exists depends_on_id uuid references public.project_milestones (id) on delete set null;
+alter table public.project_milestones
+  add column if not exists linked_requirement_ids uuid[] not null default '{}';
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint
+    where conname = 'project_milestones_progress_range'
+      and conrelid = 'public.project_milestones'::regclass
+  ) then
+    alter table public.project_milestones
+      add constraint project_milestones_progress_range check (progress between 0 and 100);
+  end if;
+end;
+$$;
 
 create table if not exists public.project_messages (
   id uuid primary key default gen_random_uuid(),

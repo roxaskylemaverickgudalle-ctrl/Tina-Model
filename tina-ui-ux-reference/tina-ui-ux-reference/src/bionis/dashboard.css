@@ -1,0 +1,28 @@
+.bionis-dashboard {
+  --live: oklch(0.62 0.17 150);
+  --vital-good: oklch(0.62 0.17 150);
+  --prediction-warn: oklch(0.72 0.16 65);
+  --prediction-danger: oklch(0.6 0.22 25);
+  --chart-warn: oklch(0.65 0.16 55);
+  --chart-warn-bg: oklch(0.96 0.04 75);
+  --chart-period: oklch(0.58 0.19 255);
+  --chart-period-bg: oklch(0.95 0.03 255);
+  --bionis-blue: oklch(0.6 0.2 255);
+  --metric-heart: oklch(0.63 0.22 20);
+  --metric-steps: oklch(0.6 0.2 255);
+  --metric-sleep: oklch(0.55 0.2 285);
+  --metric-recovery: oklch(0.65 0.14 180);
+  --metric-vital: oklch(0.6 0.2 255);
+  --insight-prediction: oklch(0.55 0.2 275);
+  --insight-vitals: oklch(0.63 0.22 20);
+  --insight-actions: oklch(0.65 0.14 180);
+  --promo-gradient-from: var(--background);
+  --promo-gradient-to: oklch(0.6 0.2 255);
+  font-family: 'Inter Tight', system-ui, sans-serif;
+}
+.dark .bionis-dashboard {
+  --chart-warn-bg: oklch(0.3 0.05 65);
+  --chart-period-bg: oklch(0.3 0.06 255);
+}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
